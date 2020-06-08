@@ -271,20 +271,7 @@ export default {
       this.$el.ondragstart = () => false
     }
 
-    const [parentWidth, parentHeight] = this.getParentSize()
-
-    this.parentWidth = parentWidth
-    this.parentHeight = parentHeight
-
-    const [width, height] = getComputedSize(this.$el)
-
-    this.aspectFactor = (this.w !== 'auto' ? this.w : width) / (this.h !== 'auto' ? this.h : height)
-
-    this.width = this.w !== 'auto' ? this.w : width
-    this.height = this.h !== 'auto' ? this.h : height
-
-    this.right = this.parentWidth - this.width - this.left
-    this.bottom = this.parentHeight - this.height - this.top
+    this.setDimensions()
 
     addEvent(document.documentElement, 'mousedown', this.deselect)
     addEvent(document.documentElement, 'touchend touchcancel', this.deselect)
@@ -303,6 +290,22 @@ export default {
   },
 
   methods: {
+    setDimensions () {
+      const [parentWidth, parentHeight] = this.getParentSize()
+
+      this.parentWidth = parentWidth
+      this.parentHeight = parentHeight
+
+      const [width, height] = getComputedSize(this.$el)
+
+      this.aspectFactor = (this.w !== 'auto' ? this.w : width) / (this.h !== 'auto' ? this.h : height)
+
+      this.width = this.w !== 'auto' ? this.w : width
+      this.height = this.h !== 'auto' ? this.h : height
+
+      this.right = this.parentWidth - this.width - this.left
+      this.bottom = this.parentHeight - this.height - this.top
+    },
     resetBoundsAndMouseState () {
       this.mouseClickPosition = { mouseX: 0, mouseY: 0, x: 0, y: 0, w: 0, h: 0 }
 
@@ -452,6 +455,11 @@ export default {
 
       this.mouseClickPosition.mouseX = e.touches ? e.touches[0].pageX : e.pageX
       this.mouseClickPosition.mouseY = e.touches ? e.touches[0].pageY : e.pageY
+      if (this.w === 'auto' || this.h === 'auto') {
+        this.setDimensions()
+        this.calcDragLimits()
+      }
+
       this.mouseClickPosition.left = this.left
       this.mouseClickPosition.right = this.right
       this.mouseClickPosition.top = this.top
